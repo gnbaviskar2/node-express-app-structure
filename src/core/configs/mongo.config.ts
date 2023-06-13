@@ -1,5 +1,7 @@
 export default {
-  MONGO_HOSTNAME: process.env.MONGO_HOSTNAME
-    ? process.env.MONGO_HOSTNAME
-    : 'localhost',
+  MONGO_INITDB_ROOT_USERNAME: process.env.MONGO_INITDB_ROOT_USERNAME || 'root',
+  MONGO_INITDB_ROOT_PASSWORD: process.env.MONGO_INITDB_ROOT_PASSWORD || 'root',
+  MONGO_INITDB_ROOT_HOST: process.env.MONGO_INITDB_ROOT_HOST || '127.0.0.1',
+  MONGO_INITDB_ROOT_PORT: process.env.MONGO_INITDB_ROOT_PORT || 27017,
+  MONGO_INITDB_ROOT_DB1: process.env.MONGO_INITDB_ROOT_DB1 || 'ecommDB_local',
 };

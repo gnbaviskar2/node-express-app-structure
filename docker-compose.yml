@@ -1,0 +1,24 @@
+# docker compose is created so that old long docker commands be removed. docker compose makes easy to run/configure the docker command
+#  docker version
+version: '3'
+# service like node, mongo redis etd
+services:
+  # mongo container declaration
+  mongo-container:
+    # specific version of mongo
+    image: mongo:4.0.0
+    # following env vars are grabbed from .env file
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      # opening ports for development purpose
+      # this can bad practise to open db ports to outside world
+    ports:
+      - '${MONGO_INITDB_ROOT_PORT}:${MONGO_INITDB_ROOT_PORT}'
+    volumes:
+      # preserving the volumes so that can be preserved
+      - mongo-db:/data/db
+
+# preserving the volumes so that can be preserved
+volumes:
+  mongo-db:

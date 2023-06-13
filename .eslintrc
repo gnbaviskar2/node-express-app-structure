@@ -37,7 +37,8 @@
     "@typescript-eslint/no-explicit-any": "off",
     "operator-linebreak": "off",
     "no-param-reassign": "off",
-    "object-curly-newline": "off"
+    "object-curly-newline": "off",
+    "arrow-body-style": "off"
   },
   "settings": {
     "import/resolver": {
