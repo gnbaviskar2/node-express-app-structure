@@ -8,6 +8,12 @@ const getAllProducts = () => {
   );
 };
 
+const getAllProduct = (_id: string) => {
+  return productModelObj.ProductModel.findOne({ _id }).select(
+    responseHandlers.productResponseFields
+  );
+};
+
 const createProduct = async (productPayload: productPayloadType) => {
   return productModelObj.ProductModel.create({
     title: productPayload.title,
@@ -17,4 +23,4 @@ const createProduct = async (productPayload: productPayloadType) => {
   });
 };
 
-export { getAllProducts, createProduct };
+export { getAllProducts, getAllProduct, createProduct };

@@ -10,6 +10,23 @@ const getAllProducts = async (req: Request, res: Response) => {
   return res.json(products);
 };
 
+const getAllProduct = async (req: Request, res: Response) => {
+  const isValidInput = productValidators.validateSingleGetProduct(
+    req.params._id
+  );
+  if (isValidInput.error) {
+    // TODO: remove after error handling
+    console.log(`validation error: ${isValidInput.error.message}`);
+    throw new Error(isValidInput.error.message);
+  }
+
+  const product = await productRepo.getAllProduct(req.params._id);
+  if (!product) {
+    res.json('no product with the id');
+  }
+  return res.json(product);
+};
+
 const createProduct = async (req: Request, res: Response) => {
   const productPayload: productPayloadType = {
     title: req.body.title,
@@ -29,4 +46,4 @@ const createProduct = async (req: Request, res: Response) => {
     .json(responseHandlers.responseProductData(product));
 };
 
-export { getAllProducts, createProduct };
+export { getAllProducts, createProduct, getAllProduct };
