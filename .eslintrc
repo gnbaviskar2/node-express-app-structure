@@ -38,7 +38,8 @@
     "operator-linebreak": "off",
     "no-param-reassign": "off",
     "object-curly-newline": "off",
-    "arrow-body-style": "off"
+    "arrow-body-style": "off",
+    "no-underscore-dangle": "off" // mongo returns _id
   },
   "settings": {
     "import/resolver": {

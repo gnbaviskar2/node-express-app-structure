@@ -6,4 +6,12 @@ type expressHttpObjType = {
   httpServer: Server;
 };
 
-export { expressHttpObjType };
+interface productPayloadType {
+  _id?: string;
+  title: string;
+  price: number;
+  description: string;
+  imageUrl: string;
+}
+
+export { expressHttpObjType, productPayloadType };
