@@ -1,9 +1,11 @@
-// import moment from 'moment';
 import { productModelObj } from '../model';
 import { productPayloadType } from '../interface';
+import { responseHandlers } from '../helpers/handlers';
 
 const getAllProducts = () => {
-  return productModelObj.ProductModel.find({});
+  return productModelObj.ProductModel.find({}).select(
+    responseHandlers.productResponseFields
+  );
 };
 
 const createProduct = async (productPayload: productPayloadType) => {
