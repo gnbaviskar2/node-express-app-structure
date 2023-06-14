@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import mongoose from 'mongoose';
 import { productModelObj } from '../../model';
+import { productPayloadType } from '../../interface';
 
 // cannot mix 1 and 0 except for _id
 const productResponseFields = {
@@ -12,7 +12,9 @@ const productResponseFields = {
   imageUrl: 1,
 };
 
-const responseProductData = (doc: productModelObj.ProductModelType) => {
+const responseProductData = (
+  doc: productModelObj.ProductModelType | productPayloadType
+) => {
   return {
     _id: productResponseFields._id === 1 ? doc._id : undefined,
     title: _.has(productResponseFields, 'title') ? doc.title : undefined,
@@ -26,8 +28,4 @@ const responseProductData = (doc: productModelObj.ProductModelType) => {
   };
 };
 
-function checkIfMongooseObject(obj: any) {
-  return _.get(obj, 'constructor.base') instanceof mongoose.Mongoose;
-}
-
-export { responseProductData, productResponseFields, checkIfMongooseObject };
+export { responseProductData, productResponseFields };
