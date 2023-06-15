@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import { productModelObj } from '../../model';
-import { productPayloadType } from '../../interface';
+import { productModelObj, userModelObj } from '../../model';
+import { productPayloadType, userPayloadType } from '../../interface';
 
 // cannot mix 1 and 0 except for _id
 const productResponseFields = {
@@ -28,4 +28,35 @@ const responseProductData = (
   };
 };
 
-export { responseProductData, productResponseFields };
+// cannot mix 1 and 0 except for _id
+const userResponseFields = {
+  // adding and removing fields here will also affect other product method response
+  _id: 1,
+  firstname: 1,
+  lastname: 1,
+  username: 1,
+  email: 1,
+  cart: 1,
+};
+
+const responseUserData = (
+  doc: userModelObj.UserModelType | userPayloadType
+) => {
+  return {
+    _id: userResponseFields._id === 1 ? doc._id : undefined,
+    firstname: _.has(userResponseFields, 'firstname')
+      ? doc.firstname
+      : undefined,
+    lastname: _.has(userResponseFields, 'lastname') ? doc.lastname : undefined,
+    username: _.has(userResponseFields, 'username') ? doc.username : undefined,
+    email: _.has(userResponseFields, 'email') ? doc.email : undefined,
+    cart: _.has(userResponseFields, 'cart') ? doc.cart : undefined,
+  };
+};
+
+export {
+  responseProductData,
+  productResponseFields,
+  responseUserData,
+  userResponseFields,
+};

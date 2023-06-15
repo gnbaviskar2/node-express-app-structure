@@ -14,4 +14,20 @@ interface productPayloadType {
   imageUrl: string;
 }
 
-export { expressHttpObjType, productPayloadType };
+interface cartPayload {
+  productId: string;
+  quantity: number;
+}
+
+interface userPayloadType {
+  _id?: string;
+  firstname: string;
+  lastname: string;
+  username: string;
+  password: string;
+  email: string;
+  cart: [cartPayload?];
+  createdAt?: string;
+}
+
+export { expressHttpObjType, productPayloadType, userPayloadType };

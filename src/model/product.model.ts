@@ -8,7 +8,7 @@ export interface ProductModelType extends Document {
   imageUrl: string;
 }
 
-const productModel = new Schema({
+const productSchema = new Schema({
   title: {
     type: String,
     require: true,
@@ -27,6 +27,10 @@ const productModel = new Schema({
     type: String,
     require: true,
   },
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+  },
   createdAt: {
     type: Date,
     require: true,
@@ -37,6 +41,6 @@ const productModel = new Schema({
   },
 });
 
-const ProductModel = mongoose.model<ProductModelType>('Product', productModel);
+const ProductModel = mongoose.model<ProductModelType>('Product', productSchema);
 
 export default ProductModel;

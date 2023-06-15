@@ -7,7 +7,7 @@ import { productValidators } from '../helpers/validators';
 import { responseHandlers } from '../helpers/handlers';
 
 const getAllProducts = async (req: Request, res: Response) => {
-  const products = await productRepo.getAllProducts();
+  const products = productRepo.getAllProducts();
   return res.json(products);
 };
 

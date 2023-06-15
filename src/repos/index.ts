@@ -1,3 +1,4 @@
 import * as productRepo from './product.repo';
+import * as userRepo from './user.repo';
 
-export { productRepo };
+export { productRepo, userRepo };
