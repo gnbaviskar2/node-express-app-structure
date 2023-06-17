@@ -41,13 +41,23 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
       description: 'Could not create user',
     });
   }
-  res.status(httpCodes.OK).json(responseHandlers.responseUserData(userCreated));
+  return responseHandlers.apiResponse(
+    res,
+    httpCodes.OK,
+    responseHandlers.responseUserData(userCreated),
+    'SignUp successful'
+  );
 });
 
 const getUser = asyncHandler(async (req: Request, res: Response) => {
   const user = await userRepo.getUser(req.params._id);
   if (user) {
-    res.status(httpCodes.OK).json(responseHandlers.responseUserData(user));
+    return responseHandlers.apiResponse(
+      res,
+      httpCodes.OK,
+      responseHandlers.responseUserData(user),
+      'User found'
+    );
   }
   throw new AppError({
     httpCode: HttpCodeEnum.NOT_FOUND,
@@ -57,7 +67,12 @@ const getUser = asyncHandler(async (req: Request, res: Response) => {
 
 const getUsers = asyncHandler(async (req: Request, res: Response) => {
   const users = await userRepo.getUsers();
-  res.status(httpCodes.OK).json(users);
+  return responseHandlers.apiResponse(
+    res,
+    httpCodes.OK,
+    { users },
+    'Users found'
+  );
 });
 
 const loginUser = asyncHandler(async (req: Request, res: Response) => {
@@ -79,9 +94,12 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
   }
   const token = await signJsonWebToken(user);
 
-  res.status(httpCodes.OK).json({
-    token,
-  });
+  return responseHandlers.apiResponse(
+    res,
+    httpCodes.OK,
+    { accessToken: token },
+    'Logged In'
+  );
 });
 
 const deleteUser = asyncHandler(async (req: Request, res: Response) => {
@@ -92,8 +110,13 @@ const deleteUser = asyncHandler(async (req: Request, res: Response) => {
       description: 'Could not delete the user!',
     });
   }
-  // TODO: manage response
-  res.status(httpCodes.OK).json(delResult);
+
+  return responseHandlers.apiResponse(
+    res,
+    httpCodes.OK,
+    { result: delResult },
+    'User Deleted'
+  );
 });
 
 export { createUser, getUser, getUsers, loginUser, deleteUser };
