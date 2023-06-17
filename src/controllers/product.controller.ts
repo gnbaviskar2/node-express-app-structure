@@ -5,9 +5,10 @@ import { productPayloadType } from '../interface';
 import { httpCodes } from '../core/constants';
 import { productValidators } from '../helpers/validators';
 import { responseHandlers } from '../helpers/handlers';
+import { ProtectedRequest } from '../types/app-request';
 
 const getAllProducts = async (req: Request, res: Response) => {
-  const products = productRepo.getAllProducts();
+  const products = await productRepo.getAllProducts();
   return res.json(products);
 };
 
@@ -24,32 +25,41 @@ const getAllProduct = async (req: Request, res: Response) => {
   return res.json(product);
 };
 
-const createProduct = async (req: Request, res: Response) => {
+const createProduct = async (req: ProtectedRequest, res: Response) => {
   const productPayload: productPayloadType = {
     title: req.body.title,
     description: req.body.description,
     imageUrl: req.body.imageUrl,
     price: req.body.price,
+    userId: req.user._id,
   };
-  const isValidInput = productValidators.validateCreateProduct(productPayload);
-  if (isValidInput.error) {
-    // TODO: remove after error handling
-    console.log(`validation error: ${isValidInput.error.message}`);
-    throw new Error(isValidInput.error.message);
+
+  try {
+    const isValidInput =
+      productValidators.validateCreateProduct(productPayload);
+    if (isValidInput.error) {
+      // TODO: remove after error handling
+      console.log(`validation error: ${isValidInput.error.message}`);
+      throw new Error(isValidInput.error.message);
+    }
+    const product = await productRepo.createProduct(productPayload);
+    return res
+      .status(httpCodes.CREATED)
+      .json(responseHandlers.responseProductData(product));
+  } catch (e: any) {
+    console.log(e);
+    throw new Error(e);
   }
-  const product = await productRepo.createProduct(productPayload);
-  return res
-    .status(httpCodes.CREATED)
-    .json(responseHandlers.responseProductData(product));
 };
 
-const updateProduct = async (req: Request, res: Response) => {
+const updateProduct = async (req: ProtectedRequest, res: Response) => {
   const productPayload: productPayloadType = {
     title: req.body.title,
     description: req.body.description,
     imageUrl: req.body.imageUrl,
     price: req.body.price,
     _id: req.body._id,
+    userId: req.user._id,
   };
   const isValidInput = productValidators.validateUpdateProduct(productPayload);
   if (isValidInput.error) {

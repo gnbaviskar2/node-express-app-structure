@@ -41,4 +41,6 @@ mongoose.connection.on('open', () => {
   logger.info(`Mongoose DEFAULT CONNECTION OPEN TO ${MONGO_URI}`);
 });
 
+mongoose.set('debug', true);
+
 export default connectToMongo;

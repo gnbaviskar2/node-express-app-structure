@@ -6,34 +6,36 @@ export interface ProductModelType extends Document {
   price: number;
   description: string;
   imageUrl: string;
+  userId: string;
 }
 
 const productSchema = new Schema({
   title: {
     type: String,
-    require: true,
+    required: true,
     lowercase: true,
   },
   price: {
     type: Number,
-    require: true,
+    required: true,
   },
   description: {
     type: String,
-    require: true,
+    required: true,
     lowercase: true,
   },
   imageUrl: {
     type: String,
-    require: true,
+    required: true,
   },
   userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
+    required: true,
   },
   createdAt: {
     type: Date,
-    require: true,
+    required: true,
   },
   updatedAt: {
     type: Date,

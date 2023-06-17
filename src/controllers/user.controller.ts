@@ -6,6 +6,7 @@ import { userRepo } from '../repos';
 import { userPayloadType } from '../interface';
 import { userValidators } from '../helpers/validators';
 import { responseHandlers } from '../helpers/handlers';
+import { signJsonWebToken } from '../core/utils/auth.util';
 
 const createUser = async (req: Request, res: Response) => {
   const payload: userPayloadType = {
@@ -61,12 +62,17 @@ const loginUser = async (req: Request, res: Response) => {
 
   // decode password
   const password = base64.decode(req.body.password);
-  const isCorrectUser = await bcrypt.compare(password, user.password);
-  if (!isCorrectUser) {
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) {
     console.log('incorrect username/ password');
     throw new Error('incorrect username/ password');
   }
-  return res.status(httpCodes.OK).json(responseHandlers.responseUserData(user));
+
+  const token = await signJsonWebToken(user);
+
+  return res.status(httpCodes.OK).json({
+    token,
+  });
 };
 
 const deleteUser = async (req: Request, res: Response) => {

@@ -12,6 +12,7 @@ interface productPayloadType {
   price: number;
   description: string;
   imageUrl: string;
+  userId: string;
 }
 
 interface cartPayload {
@@ -30,4 +31,11 @@ interface userPayloadType {
   createdAt?: string;
 }
 
-export { expressHttpObjType, productPayloadType, userPayloadType };
+interface jwtPayload {
+  email: string;
+  exp: number;
+  iat: number;
+  user_id: string;
+}
+
+export { expressHttpObjType, productPayloadType, userPayloadType, jwtPayload };

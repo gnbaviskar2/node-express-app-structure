@@ -1,9 +1,12 @@
+import moment from 'moment';
 import ProductModel from '../model/product.model';
 import { productPayloadType } from '../interface';
 import { responseHandlers } from '../helpers/handlers';
 
 const getAllProducts = () => {
-  return ProductModel.find({}).select(responseHandlers.productResponseFields);
+  return ProductModel.find({})
+    .select(responseHandlers.productResponseFields)
+    .populate('userId');
 };
 
 const getAllProduct = (_id: string) => {
@@ -18,6 +21,8 @@ const createProduct = async (productPayload: productPayloadType) => {
     price: productPayload.price,
     description: productPayload.description,
     imageUrl: productPayload.imageUrl,
+    userId: productPayload.userId,
+    createdAt: moment(),
   });
 };
 
