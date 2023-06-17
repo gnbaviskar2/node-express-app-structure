@@ -10,9 +10,9 @@ const getAllProducts = () => {
 };
 
 const getAllProduct = (_id: string) => {
-  return ProductModel.findOne({ _id }).select(
-    responseHandlers.productResponseFields
-  );
+  return ProductModel.findOne({ _id })
+    .select(responseHandlers.productResponseFields)
+    .populate('userId');
 };
 
 const createProduct = async (productPayload: productPayloadType) => {
