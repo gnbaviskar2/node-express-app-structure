@@ -1,6 +1,8 @@
 import _ from 'lodash';
+import { Response } from 'express';
 import { productModelObj, userModelObj } from '../../model';
 import { productPayloadType, userPayloadType } from '../../interface';
+import { httpCodes } from '../../core/constants';
 
 // cannot mix 1 and 0 except for _id
 const productResponseFields = {
@@ -54,9 +56,27 @@ const responseUserData = (
   };
 };
 
+interface finRes {
+  code: number;
+  success: boolean;
+  message: string;
+  data: any;
+}
+
+const apiResponse = (res: Response, code: number, data?: any, msg?: string) => {
+  const resMessage: finRes = {
+    code: code || 200,
+    success: true,
+    message: msg || '',
+    data: data || {},
+  };
+  res.status(httpCodes.OK).json(resMessage);
+};
+
 export {
   responseProductData,
   productResponseFields,
   responseUserData,
   userResponseFields,
+  apiResponse,
 };

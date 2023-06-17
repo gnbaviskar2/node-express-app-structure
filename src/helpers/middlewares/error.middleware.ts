@@ -10,6 +10,7 @@ const errorFormatter = (
     // // format the error
     res.status(error.httpCode || 500).json({
       name: error.name,
+      success: false,
       code: error.httpCode,
       message: error.description || 'Something is wrong',
       isOperational: error.isOperational,

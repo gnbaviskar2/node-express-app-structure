@@ -11,7 +11,14 @@ import AppError, { HttpCodeEnum } from '../helpers/handlers/api.error.handler';
 
 const getAllProducts = asyncHandler(async (req: Request, res: Response) => {
   const products = await productRepo.getAllProducts();
-  res.json(products);
+  return responseHandlers.apiResponse(
+    res,
+    httpCodes.OK,
+    {
+      products,
+    },
+    'Products found'
+  );
 });
 
 const getAllProduct = asyncHandler(async (req: Request, res: Response) => {
@@ -29,7 +36,12 @@ const getAllProduct = asyncHandler(async (req: Request, res: Response) => {
       description: 'No products found',
     });
   }
-  res.json(product);
+  return responseHandlers.apiResponse(
+    res,
+    httpCodes.OK,
+    product,
+    'Product found'
+  );
 });
 
 const createProduct = asyncHandler(
@@ -51,9 +63,12 @@ const createProduct = asyncHandler(
       });
     }
     const product = await productRepo.createProduct(productPayload);
-    res
-      .status(httpCodes.CREATED)
-      .json(responseHandlers.responseProductData(product));
+    return responseHandlers.apiResponse(
+      res,
+      httpCodes.CREATED,
+      responseHandlers.responseProductData(product),
+      'Product created'
+    );
   }
 );
 
@@ -75,17 +90,19 @@ const updateProduct = asyncHandler(
         description: isValidInput.error.message,
       });
     }
-    const product = await productRepo.updateProduct(productPayload);
-    if (product.modifiedCount === 0) {
-      throw new AppError({
-        httpCode: HttpCodeEnum.INTERNAL_SERVER_ERROR,
-        description: 'Could not update',
-      });
+    const updateRes = await productRepo.updateProduct(productPayload);
+    if (updateRes) {
+      return responseHandlers.apiResponse(
+        res,
+        httpCodes.OK,
+        responseHandlers.responseProductData(productPayload),
+        'Product updated'
+      );
     }
-
-    res
-      .status(httpCodes.OK)
-      .json(responseHandlers.responseProductData(productPayload));
+    throw new AppError({
+      httpCode: HttpCodeEnum.INTERNAL_SERVER_ERROR,
+      description: 'Could not update',
+    });
   }
 );
 
@@ -98,6 +115,12 @@ const deleteProduct = asyncHandler(async (req: Request, res: Response) => {
   }
   const deleteRes = await productRepo.deleteProduct(req.params._id);
   if (deleteRes.deletedCount) {
+    return responseHandlers.apiResponse(
+      res,
+      httpCodes.OK,
+      deleteRes,
+      'Product deleted'
+    );
     res.status(httpCodes.OK).json('OK');
   }
   throw new AppError({
