@@ -2,18 +2,19 @@ import moment from 'moment';
 import UserModel from '../model/user.model';
 import { userPayloadType } from '../interface';
 import { responseHandlers } from '../helpers/handlers';
+import AppError, { HttpCodeEnum } from '../helpers/handlers/api.error.handler';
 
-const getUsers = async () => {
+const getUsers = () => {
   return UserModel.find({}, responseHandlers.userResponseFields);
 };
 
-const getUser = async (_id: string) => {
+const getUser = (_id: string) => {
   return UserModel.findOne({ _id });
 };
 
 const createUser = async (createUserPayload: userPayloadType) => {
   try {
-    const test = await UserModel.create({
+    const user = await UserModel.create({
       firstname: createUserPayload.firstname,
       lastname: createUserPayload.lastname,
       email: createUserPayload.email,
@@ -22,18 +23,29 @@ const createUser = async (createUserPayload: userPayloadType) => {
       createdAt: moment(),
       cart: [],
     });
-    return test;
+    return user;
   } catch (e: any) {
-    console.log(e);
-    throw new Error(e);
+    if (e.code === 11000) {
+      if (e.message.includes('username_')) {
+        throw new AppError({
+          httpCode: HttpCodeEnum.BAD_REQUEST,
+          description: 'Username already registered',
+        });
+      } else if (e.message.includes('email_')) {
+        throw new AppError({
+          httpCode: HttpCodeEnum.BAD_REQUEST,
+          description: 'Email already registered',
+        });
+      }
+    }
   }
 };
 
-const deleteUser = async (_id: string) => {
+const deleteUser = (_id: string) => {
   return UserModel.deleteOne({ _id });
 };
 
-const getUserByEmail = async (email: string) => {
+const getUserByEmail = (email: string) => {
   return UserModel.findOne({ email });
 };
 

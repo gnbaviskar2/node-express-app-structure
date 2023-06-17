@@ -3,6 +3,9 @@ import fs from 'fs';
 import path from 'path';
 import { UserModelType } from '../../model/user.model';
 import { jwtPayload } from '../../interface';
+import AppError, {
+  HttpCodeEnum,
+} from '../../helpers/handlers/api.error.handler';
 
 const privateKey = fs.readFileSync(
   path.join(__dirname, '../../../keys', 'rsa.key'),
@@ -14,48 +17,47 @@ const publicKey = fs.readFileSync(
 );
 
 const signJsonWebToken = async (user: UserModelType) => {
-  try {
-    const token = jwt.sign(
-      {
-        user_id: user._id,
-        email: user.email,
-      },
-      privateKey,
-      {
-        expiresIn: '12d',
-        algorithm: 'RS256',
-        // allowInsecureKeySizes: true,
-      }
-    );
-    return token;
-  } catch (e: any) {
-    console.log(e);
-    return e;
-  }
+  const token = jwt.sign(
+    {
+      user_id: user._id,
+      email: user.email,
+    },
+    privateKey,
+    {
+      expiresIn: '12d',
+      algorithm: 'RS256',
+      // allowInsecureKeySizes: true,
+    }
+  );
+  return token;
 };
 
 const getAccessToken = (authorization?: string): string => {
   if (!authorization) {
-    throw new Error('Invalid Authorization');
+    throw new AppError({
+      httpCode: HttpCodeEnum.UNAUTHORIZED,
+      description: 'Token not provided',
+    });
   }
   if (!authorization.startsWith('Bearer ')) {
-    throw new Error('Invalid Authorization');
+    throw new AppError({
+      httpCode: HttpCodeEnum.UNAUTHORIZED,
+      description: 'Invalid authorization',
+    });
   }
   return authorization.split(' ')[1];
 };
 
 const verifyToken = (authorization: string) => {
-  try {
-    return verify(authorization, publicKey);
-  } catch (e) {
-    console.log(e);
-    return e;
-  }
+  return verify(authorization, publicKey);
 };
 
 const validateToken = (token?: jwtPayload) => {
   if (!token || !token.email || !token.exp || !token.iat || !token.user_id) {
-    throw new Error('wrong token found');
+    throw new AppError({
+      httpCode: HttpCodeEnum.UNAUTHORIZED,
+      description: 'Invalid authorization',
+    });
   }
   return true;
 };
