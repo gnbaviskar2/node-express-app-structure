@@ -9,48 +9,52 @@ import { userValidators } from '../helpers/validators';
 import { responseHandlers } from '../helpers/handlers';
 import { signJsonWebToken } from '../core/utils/auth.util';
 import AppError, { HttpCodeEnum } from '../helpers/handlers/api.error.handler';
+import { ProtectedRequest } from '../types/app-request';
 
-const createUser = asyncHandler(async (req: Request, res: Response) => {
-  const payload: userPayloadType = {
-    firstname: req.body.firstname,
-    lastname: req.body.lastname,
-    email: req.body.email,
-    password: req.body.password,
-    username: req.body.username,
-    cart: [],
-  };
+const createUser = asyncHandler(
+  async (req: ProtectedRequest, res: Response) => {
+    const payload: userPayloadType = {
+      firstname: req.body.firstname,
+      lastname: req.body.lastname,
+      email: req.body.email,
+      password: req.body.password,
+      username: req.body.username,
+      cart: [],
+    };
 
-  // decode password
-  payload.password = base64.decode(payload.password);
+    // decode password
+    payload.password = base64.decode(payload.password);
 
-  const isValidInput = userValidators.validateCreateUser(payload);
-  if (isValidInput.error) {
-    throw new AppError({
-      httpCode: HttpCodeEnum.BAD_REQUEST,
-      description: isValidInput.error.message,
-    });
+    const isValidInput = userValidators.validateCreateUser(payload);
+    if (isValidInput.error) {
+      throw new AppError({
+        httpCode: HttpCodeEnum.BAD_REQUEST,
+        description: isValidInput.error.message,
+      });
+    }
+
+    // hash password
+    payload.password = await bcrypt.hash(payload.password, 10);
+
+    const userCreated = await userRepo.createUser(payload);
+    if (!userCreated) {
+      throw new AppError({
+        httpCode: HttpCodeEnum.INTERNAL_SERVER_ERROR,
+        description: 'Could not create user',
+      });
+    }
+    return responseHandlers.apiResponse(
+      res,
+      httpCodes.OK,
+      responseHandlers.responseUserData(userCreated),
+      'SignUp successful'
+    );
   }
+);
 
-  // hash password
-  payload.password = await bcrypt.hash(payload.password, 10);
-
-  const userCreated = await userRepo.createUser(payload);
-  if (!userCreated) {
-    throw new AppError({
-      httpCode: HttpCodeEnum.INTERNAL_SERVER_ERROR,
-      description: 'Could not create user',
-    });
-  }
-  return responseHandlers.apiResponse(
-    res,
-    httpCodes.OK,
-    responseHandlers.responseUserData(userCreated),
-    'SignUp successful'
-  );
-});
-
-const getUser = asyncHandler(async (req: Request, res: Response) => {
+const getUser = asyncHandler(async (req: ProtectedRequest, res: Response) => {
   const user = await userRepo.getUser(req.params._id);
+
   if (user) {
     return responseHandlers.apiResponse(
       res,
@@ -65,7 +69,7 @@ const getUser = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-const getUsers = asyncHandler(async (req: Request, res: Response) => {
+const getUsers = asyncHandler(async (req: ProtectedRequest, res: Response) => {
   const users = await userRepo.getUsers();
   return responseHandlers.apiResponse(
     res,
@@ -97,7 +101,12 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
   return responseHandlers.apiResponse(
     res,
     httpCodes.OK,
-    { accessToken: token },
+    {
+      userId: user._id,
+      email: user.email,
+      username: user.username,
+      accessToken: token,
+    },
     'Logged In'
   );
 });

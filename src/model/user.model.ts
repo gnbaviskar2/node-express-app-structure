@@ -1,6 +1,7 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { ObjectId, Schema } from 'mongoose';
+import _ from 'lodash';
 
-interface Cart extends Document {
+interface CartType extends Document {
   productId: string;
   quantity: number;
 }
@@ -12,7 +13,8 @@ export interface UserModelType extends Document {
   username: string;
   email: string;
   password: string;
-  cart: [Cart];
+  cart: [CartType];
+  readEmail: (product: string) => void;
 }
 
 const userSchema = new Schema(
@@ -67,6 +69,26 @@ const userSchema = new Schema(
   },
   { versionKey: false }
 );
+
+userSchema.method('addToCart', function (productId: string) {
+  const prodIndex = _.findIndex(this.cart, (thisCart: CartType) => {
+    // console.log(
+    //   `this card id: ${thisCart.productId.toString} received: ${productId}`
+    // );
+    return thisCart.productId.toString() === productId;
+  });
+
+  if (prodIndex >= 0) {
+    this.cart[prodIndex].quantity += 1;
+  } else {
+    const newCartItem = {
+      productId,
+      quantity: 1,
+    } as CartType;
+    this.cart.push(newCartItem);
+  }
+  this.save();
+});
 
 const UserModel = mongoose.model<UserModelType>('User', userSchema);
 export default UserModel;

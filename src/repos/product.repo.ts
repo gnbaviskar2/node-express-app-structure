@@ -42,10 +42,15 @@ const deleteProduct = async (_id: string) => {
   return ProductModel.deleteOne({ _id });
 };
 
+const getProductById = async (_id: string) => {
+  return ProductModel.findOne({ _id });
+};
+
 export {
   getAllProducts,
   getAllProduct,
   createProduct,
   updateProduct,
   deleteProduct,
+  getProductById,
 };

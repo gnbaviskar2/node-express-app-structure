@@ -9,7 +9,7 @@ const getUsers = () => {
 };
 
 const getUser = (_id: string) => {
-  return UserModel.findOne({ _id });
+  return UserModel.findOne({ _id }).populate('cart');
 };
 
 const createUser = async (createUserPayload: userPayloadType) => {

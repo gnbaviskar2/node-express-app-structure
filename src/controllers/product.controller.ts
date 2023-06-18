@@ -121,17 +121,42 @@ const deleteProduct = asyncHandler(async (req: Request, res: Response) => {
       deleteRes,
       'Product deleted'
     );
-    res.status(httpCodes.OK).json('OK');
   }
   throw new AppError({
     httpCode: HttpCodeEnum.INTERNAL_SERVER_ERROR,
     description: 'Could not delete',
   });
 });
+
+const addToCart = asyncHandler(async (req: ProtectedRequest, res: Response) => {
+  if (!req.body._id) {
+    throw new AppError({
+      httpCode: HttpCodeEnum.BAD_REQUEST,
+      description: 'product id required',
+    });
+  }
+  const product = await productRepo.getProductById(req.body._id);
+  if (!product) {
+    throw new AppError({
+      httpCode: HttpCodeEnum.BAD_REQUEST,
+      description: `No product found for the id: ${req.body._id}`,
+    });
+  }
+
+  await req.user.addToCart(product._id.toString());
+  return responseHandlers.apiResponse(
+    res,
+    httpCodes.OK,
+    req.user,
+    'Added to Cart'
+  );
+});
+
 export {
   getAllProducts,
   createProduct,
   getAllProduct,
   updateProduct,
   deleteProduct,
+  addToCart,
 };
