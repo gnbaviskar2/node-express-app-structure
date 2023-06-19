@@ -1,8 +1,9 @@
 import mongoose, { ObjectId, Schema } from 'mongoose';
 import _ from 'lodash';
+import { ProductModelType } from './product.model';
 
 export interface CartType extends Document {
-  productId: string;
+  productId: string | ProductModelType;
   quantity: number;
 }
 

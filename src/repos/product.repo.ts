@@ -101,6 +101,19 @@ const removeCartIfQntyZero = async (userId: ObjectId) => {
   );
 };
 
+const removeAllItemsFromCart = async (userId: ObjectId) => {
+  return UserModel.updateOne(
+    {
+      _id: userId,
+    },
+    {
+      $set: {
+        cart: [],
+      },
+    }
+  );
+};
+
 export {
   getAllProducts,
   getAllProduct,
@@ -113,4 +126,5 @@ export {
   addItemToCart,
   decrementCartCount,
   removeCartIfQntyZero,
+  removeAllItemsFromCart,
 };
