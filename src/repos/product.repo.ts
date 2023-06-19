@@ -92,7 +92,9 @@ const removeCartIfQntyZero = async (userId: ObjectId) => {
     {
       $pull: {
         cart: {
-          quantity: 0,
+          quantity: {
+            $lte: 0,
+          },
         },
       },
     }
