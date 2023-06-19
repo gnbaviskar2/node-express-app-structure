@@ -14,7 +14,7 @@ const createOrder = asyncHandler(
     if (req.user?.cart.length <= 0) {
       throw new AppError({
         httpCode: HttpCodeEnum.BAD_REQUEST,
-        description: 'Wrong username/ password',
+        description: 'No item found in cart',
       });
     }
 
@@ -47,4 +47,39 @@ const createOrder = asyncHandler(
   }
 );
 
-export { createOrder };
+const deleteOrder = asyncHandler(
+  async (req: ProtectedRequest, res: Response) => {
+    if (!req.body._id) {
+      throw new AppError({
+        httpCode: HttpCodeEnum.BAD_REQUEST,
+        description: 'order id is required',
+      });
+    }
+
+    const orderRes = await orderRepo.removeOrderById(req.body._id);
+
+    responseHandlers.apiResponse(
+      res,
+      httpCodes.CREATED,
+      orderRes,
+      'Order deleted!'
+    );
+  }
+);
+
+const getOrdersByUserId = asyncHandler(
+  async (req: ProtectedRequest, res: Response) => {
+    const userId = req.user?._id;
+
+    const orders = await orderRepo.getOrdersByUserId(userId);
+
+    responseHandlers.apiResponse(
+      res,
+      httpCodes.CREATED,
+      orders,
+      'Order deleted!'
+    );
+  }
+);
+
+export { createOrder, deleteOrder, getOrdersByUserId };
