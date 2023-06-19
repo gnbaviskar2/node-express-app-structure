@@ -58,12 +58,7 @@ const deleteOrder = asyncHandler(
 
     const orderRes = await orderRepo.removeOrderById(req.body._id);
 
-    responseHandlers.apiResponse(
-      res,
-      httpCodes.CREATED,
-      orderRes,
-      'Order deleted!'
-    );
+    responseHandlers.apiResponse(res, httpCodes.OK, orderRes, 'Order deleted!');
   }
 );
 
@@ -73,12 +68,7 @@ const getOrdersByUserId = asyncHandler(
 
     const orders = await orderRepo.getOrdersByUserId(userId);
 
-    responseHandlers.apiResponse(
-      res,
-      httpCodes.CREATED,
-      orders,
-      'Order deleted!'
-    );
+    responseHandlers.apiResponse(res, httpCodes.OK, orders, 'Order deleted!');
   }
 );
 
