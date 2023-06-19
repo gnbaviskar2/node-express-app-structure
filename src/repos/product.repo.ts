@@ -76,6 +76,29 @@ const addItemToCart = async (userId: ObjectId, cartItem: CartType) => {
   );
 };
 
+const decrementCartCount = async (userId: ObjectId, productId: ObjectId) => {
+  return UserModel.updateOne(
+    {
+      _id: userId,
+      'cart.productId': productId,
+    },
+    { $inc: { 'cart.$.quantity': -1 } }
+  );
+};
+
+const removeCartIfQntyZero = async (userId: ObjectId) => {
+  return UserModel.updateOne(
+    { _id: userId },
+    {
+      $pull: {
+        cart: {
+          quantity: 0,
+        },
+      },
+    }
+  );
+};
+
 export {
   getAllProducts,
   getAllProduct,
@@ -86,4 +109,6 @@ export {
   incrementCartCount,
   checkItemExistInCart,
   addItemToCart,
+  decrementCartCount,
+  removeCartIfQntyZero,
 };

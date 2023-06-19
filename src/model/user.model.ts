@@ -71,6 +71,7 @@ const userSchema = new Schema(
   { versionKey: false }
 );
 
+// following method is not being used
 userSchema.method('addToCart', function (productId: string) {
   this.depopulate(); // this will remove the effect of populated cart
   const prodIndex = _.findIndex(this.cart, (thisCart: CartType) => {
@@ -90,6 +91,17 @@ userSchema.method('addToCart', function (productId: string) {
     this.cart.push(newCartItem);
   }
   this.save();
+});
+
+// following method is not being used
+userSchema.method('removeFromCartIfQuantityZero', async function () {
+  this.depopulate(); // this will remove the effect of populated cart
+  let cartItems: CartType[] = this.cart;
+  cartItems = _.filter(cartItems, (cart: CartType) => {
+    return cart.quantity > 0;
+  });
+  this.cart = cartItems;
+  await this.save();
 });
 
 const UserModel = mongoose.model<UserModelType>('User', userSchema);

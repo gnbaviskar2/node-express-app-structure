@@ -181,13 +181,52 @@ const addToCart2 = asyncHandler(
         quantity: 1,
       } as CartType;
       await productRepo.addItemToCart(req.user._id, cartItem);
-      req.user = await userRepo.getUser(req.user._id);
     }
+    req.user = await userRepo.getUser(req.user._id);
     return responseHandlers.apiResponse(
       res,
       httpCodes.OK,
       req.user,
       'Added to Cart'
+    );
+  }
+);
+
+const removeFromCart = asyncHandler(
+  async (req: ProtectedRequest, res: Response) => {
+    if (!req.body._id) {
+      throw new AppError({
+        httpCode: HttpCodeEnum.BAD_REQUEST,
+        description: 'product id required',
+      });
+    }
+    const product = await productRepo.getProductById(req.body._id);
+    if (!product) {
+      throw new AppError({
+        httpCode: HttpCodeEnum.BAD_REQUEST,
+        description: `No product found for the id: ${req.body._id}`,
+      });
+    }
+
+    const isProductExistsInCart = await productRepo.checkItemExistInCart(
+      req.user._id,
+      product._id
+    );
+    if (!isProductExistsInCart) {
+      throw new AppError({
+        httpCode: HttpCodeEnum.BAD_REQUEST,
+        description: `Item does not exist in cart with product id: ${req.body._id}`,
+      });
+    }
+
+    await productRepo.decrementCartCount(req.user._id, product._id);
+    await productRepo.removeCartIfQntyZero(req.user._id);
+    req.user = await userRepo.getUser(req.user._id);
+    return responseHandlers.apiResponse(
+      res,
+      httpCodes.OK,
+      req.user,
+      'Removed to Cart'
     );
   }
 );
@@ -200,4 +239,5 @@ export {
   deleteProduct,
   addToCart,
   addToCart2,
+  removeFromCart,
 };
