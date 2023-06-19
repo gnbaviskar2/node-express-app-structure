@@ -9,7 +9,13 @@ const getUsers = () => {
 };
 
 const getUser = (_id: string) => {
-  return UserModel.findOne({ _id }).populate('cart');
+  return UserModel.findOne({ _id }).populate({
+    path: 'cart',
+    populate: {
+      path: 'productId',
+      model: 'Product',
+    },
+  });
 };
 
 const createUser = async (createUserPayload: userPayloadType) => {

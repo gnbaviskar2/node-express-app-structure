@@ -1,7 +1,7 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { ObjectId, Schema } from 'mongoose';
 
 export interface ProductModelType extends Document {
-  _id: string;
+  _id: ObjectId;
   title: string;
   price: number;
   description: string;

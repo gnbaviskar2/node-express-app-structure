@@ -1,7 +1,9 @@
 import moment from 'moment';
+import { ObjectId } from 'mongoose';
 import ProductModel from '../model/product.model';
 import { productPayloadType } from '../interface';
 import { responseHandlers } from '../helpers/handlers';
+import UserModel, { CartType } from '../model/user.model';
 
 const getAllProducts = () => {
   return ProductModel.find({})
@@ -46,6 +48,34 @@ const getProductById = async (_id: string) => {
   return ProductModel.findOne({ _id });
 };
 
+const incrementCartCount = async (userId: ObjectId, productId: ObjectId) => {
+  return UserModel.updateOne(
+    {
+      _id: userId,
+      'cart.productId': productId,
+    },
+    { $inc: { 'cart.$.quantity': 1 } }
+  );
+};
+
+const checkItemExistInCart = async (userId: ObjectId, productId: ObjectId) => {
+  return UserModel.findOne({
+    _id: userId,
+    'cart.productId': productId,
+  });
+};
+
+const addItemToCart = async (userId: ObjectId, cartItem: CartType) => {
+  return UserModel.updateOne(
+    { _id: userId },
+    {
+      $push: {
+        cart: cartItem,
+      },
+    }
+  );
+};
+
 export {
   getAllProducts,
   getAllProduct,
@@ -53,4 +83,7 @@ export {
   updateProduct,
   deleteProduct,
   getProductById,
+  incrementCartCount,
+  checkItemExistInCart,
+  addItemToCart,
 };

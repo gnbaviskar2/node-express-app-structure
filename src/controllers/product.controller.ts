@@ -1,13 +1,14 @@
 import { Response, Request } from 'express';
 import { ObjectId } from 'mongodb';
 import asyncHandler from '../helpers/handlers/async.handler';
-import { productRepo } from '../repos';
+import { productRepo, userRepo } from '../repos';
 import { productPayloadType } from '../interface';
 import { httpCodes } from '../core/constants';
 import { productValidators } from '../helpers/validators';
 import { responseHandlers } from '../helpers/handlers';
 import { ProtectedRequest } from '../types/app-request';
 import AppError, { HttpCodeEnum } from '../helpers/handlers/api.error.handler';
+import { CartType } from '../model/user.model';
 
 const getAllProducts = asyncHandler(async (req: Request, res: Response) => {
   const products = await productRepo.getAllProducts();
@@ -152,6 +153,45 @@ const addToCart = asyncHandler(async (req: ProtectedRequest, res: Response) => {
   );
 });
 
+const addToCart2 = asyncHandler(
+  async (req: ProtectedRequest, res: Response) => {
+    if (!req.body._id) {
+      throw new AppError({
+        httpCode: HttpCodeEnum.BAD_REQUEST,
+        description: 'product id required',
+      });
+    }
+    const product = await productRepo.getProductById(req.body._id);
+    if (!product) {
+      throw new AppError({
+        httpCode: HttpCodeEnum.BAD_REQUEST,
+        description: `No product found for the id: ${req.body._id}`,
+      });
+    }
+
+    const isProductExistsInCart = await productRepo.checkItemExistInCart(
+      req.user._id,
+      product._id
+    );
+    if (isProductExistsInCart) {
+      await productRepo.incrementCartCount(req.user._id, product._id);
+    } else {
+      const cartItem = {
+        productId: product._id.toString(),
+        quantity: 1,
+      } as CartType;
+      await productRepo.addItemToCart(req.user._id, cartItem);
+      req.user = await userRepo.getUser(req.user._id);
+    }
+    return responseHandlers.apiResponse(
+      res,
+      httpCodes.OK,
+      req.user,
+      'Added to Cart'
+    );
+  }
+);
+
 export {
   getAllProducts,
   createProduct,
@@ -159,4 +199,5 @@ export {
   updateProduct,
   deleteProduct,
   addToCart,
+  addToCart2,
 };

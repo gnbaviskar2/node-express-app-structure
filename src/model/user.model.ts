@@ -1,13 +1,13 @@
 import mongoose, { ObjectId, Schema } from 'mongoose';
 import _ from 'lodash';
 
-interface CartType extends Document {
+export interface CartType extends Document {
   productId: string;
   quantity: number;
 }
 
 export interface UserModelType extends Document {
-  _id: string;
+  _id: ObjectId;
   firstname: string;
   lastname: string;
   username: string;
@@ -51,6 +51,7 @@ const userSchema = new Schema(
           type: Schema.Types.ObjectId,
           required: true,
           ref: 'Product',
+          unique: true,
         },
         quantity: {
           type: Number,
@@ -71,6 +72,7 @@ const userSchema = new Schema(
 );
 
 userSchema.method('addToCart', function (productId: string) {
+  this.depopulate(); // this will remove the effect of populated cart
   const prodIndex = _.findIndex(this.cart, (thisCart: CartType) => {
     // console.log(
     //   `this card id: ${thisCart.productId.toString} received: ${productId}`
